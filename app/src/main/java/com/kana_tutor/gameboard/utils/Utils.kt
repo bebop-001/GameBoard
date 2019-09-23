@@ -23,30 +23,30 @@ const val ACTION_NO_ACTION  = -1
 const val MAX_TOUCH_DURATION = 500 // milliseconds
 // minimum distance to define a swipe.  Anything shorter is a click.
 const val MIN_SWIPE_DISTANCE = 50 // dp
-class TouchEvent (val x : Int = 0, val y : Int = 0
-                  , val time : Long = System.currentTimeMillis()) {
-    override fun toString(): String {
-        return String.format("x:%4d y:%4d time:%d", x, y, time)
+class SwipeDetector {
+    class Event (val x : Int = 0, val y : Int = 0
+                      , val time : Long = System.currentTimeMillis()) {
+        override fun toString(): String {
+            return String.format("x:%4d y:%4d time:%d", x, y, time)
+        }
     }
-}
-class TouchState {
-    private var start = TouchEvent(ACTION_NO_ACTION)
-    private var end = TouchEvent(ACTION_NO_ACTION)
-    fun startEvent(x : Int, y : Int) {
-        start = TouchEvent(x, y)
-        end = TouchEvent()
+    private var start = Event(ACTION_NO_ACTION)
+    private var end = Event(ACTION_NO_ACTION)
+    private fun startEvent(x : Int, y : Int) {
+        start = Event(x, y)
+        end = Event()
     }
-    fun endEvent(x: Int, y:Int) {
-        end = TouchEvent(x, y)
+    private fun endEvent(x: Int, y:Int) {
+        end = Event(x, y)
     }
-    fun cancelEvent() {
-        start = TouchEvent()
-        end = TouchEvent()
+    private fun cancelEvent() {
+        start = Event()
+        end = Event()
     }
-    fun deltaX()  = abs(start.x - end.x).toDP()
-    fun deltaY() = abs (start.y - end.y).toDP()
-    fun deltaT() = end.time - start.time
-    fun swipeDirection() : Swipe {
+    private fun deltaX()  = abs(start.x - end.x).toDP()
+    private fun deltaY() = abs (start.y - end.y).toDP()
+    private fun deltaT() = end.time - start.time
+    private fun swipeDirection() : Swipe {
         val rv: Swipe
         // event < 500 ms is no event
         if (deltaT() < MAX_TOUCH_DURATION) {
@@ -68,35 +68,36 @@ class TouchState {
         }
         return rv
     }
+    fun detect (view: View, event : MotionEvent) : Boolean {
+        var rv = true
+        val action = event.actionMasked
+        val x = event.rawX.toInt()
+        val y = event.rawY.toInt()
+        when (action) {
+            MotionEvent.ACTION_DOWN -> startEvent(x, y)
+            MotionEvent.ACTION_UP -> {
+                endEvent(x, y)
+                Log.d(
+                    "swipeDetect", "x:${deltaX()} "
+                            + "y:${deltaY()} "
+                            + "t:${deltaT()} "
+                            + "swipe: ${swipeDirection()}"
+                )
+            }
+            MotionEvent.ACTION_MOVE -> {}
+            else -> {
+                cancelEvent()
+                rv = false
+            }
+        }
+        return rv
+    }
+
     override fun toString(): String {
         return "start:$start, end:$end : direction: ${swipeDirection()}"
     }
 }
 
-fun swipeDetect (view: View, event : MotionEvent, state : TouchState) : Boolean {
-    var rv = true
-    val action = event.actionMasked
-    val x = event.rawX.toInt()
-    val y = event.rawY.toInt()
-    when (action) {
-        MotionEvent.ACTION_DOWN -> state.startEvent(x, y)
-        MotionEvent.ACTION_UP -> {
-            state.endEvent(x, y)
-            Log.d(
-                "TouchEvent", "x:${state.deltaX()} "
-                        + "y:${state.deltaY()} "
-                        + "t:${state.deltaT()} "
-                        + "swipe: ${state.swipeDirection()}"
-            )
-        }
-        MotionEvent.ACTION_MOVE -> {}
-        else -> { 
-            state.cancelEvent()
-            rv = false
-        }
-    }
-    return rv
-}
 
 /*
     Method for setting size of views in a grid layout.  Assumes square
