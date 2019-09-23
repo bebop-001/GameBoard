@@ -4,7 +4,12 @@ import android.content.res.Resources
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
+import android.widget.GridLayout
+import androidx.core.view.doOnLayout
+import java.lang.RuntimeException
 import kotlin.math.abs
+import kotlin.math.min
 
 val displayDensity = Resources.getSystem().displayMetrics.density
 fun Int.toDP() : Int = (toFloat() / displayDensity).toInt()
@@ -91,4 +96,48 @@ fun swipeDetect (view: View, event : MotionEvent, state : TouchState) : Boolean 
         }
     }
     return rv
+}
+
+/*
+    Method for setting size of views in a grid layout.  Assumes square
+    (i.e. rows == columns) layout.  Calculates max possible size and then
+    sets size to that or maxSizeDP -- which ever is smaller,
+
+    Works by queiong a layout change listener which is called when layout
+    is complete then uses the measured size of the view group containing the
+    grid layout to calculate tile size.
+ */
+fun ViewGroup.setGridAndButtonsSize(maxSizeDP : Int) {
+    doOnLayout {
+        addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+            override fun onLayoutChange(
+                view: View, left: Int, top: Int, right: Int, bottom: Int,
+                oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
+            ) {
+                val gl : GridLayout
+                if(view is ViewGroup && view.childCount > 0 && view.getChildAt(0) is GridLayout) {
+                    gl = view.getChildAt(0) as GridLayout
+                }
+                else {
+                    throw RuntimeException("setGridAndButtonsSize: "
+                            + "Failed to find GridLayout at child(0)")
+                }
+                val rows = gl.rowCount; val cols = gl.columnCount
+                if (rows != cols)
+                    throw RuntimeException("setGridAndButtonsSize:"
+                            + "currently works only with rows == columns.\n"
+                            + "Found rows = $rows, columns = $cols")
+                val w = min(min(abs(right - left), abs(top - bottom)), maxSizeDP / rows)
+                for (i in 0..(gl.childCount - 1)) {
+                    val child = gl.getChildAt(i)
+                    val layoutParams = child.layoutParams
+                    layoutParams.height = w
+                    layoutParams.width = w
+                    child.layoutParams = layoutParams
+                }
+                Log.d("onLayout:", " w = $w dp")
+                view.removeOnLayoutChangeListener(this)
+            }
+        })
+    }
 }
