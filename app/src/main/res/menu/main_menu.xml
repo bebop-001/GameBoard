@@ -28,12 +28,10 @@
         <item
             android:id="@+id/game_2048_select"
             android:title="@string/play_2048"
-            app:actionLayout="@layout/switch_item"
             app:showAsAction="never" />
         <item
             android:id="@+id/game_15_select"
             android:title="@string/play_15"
-            app:actionLayout="@layout/switch_item"
             app:showAsAction="never" />
     </group>
 

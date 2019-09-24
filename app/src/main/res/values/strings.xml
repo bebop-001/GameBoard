@@ -14,5 +14,7 @@
         &lt;br&gt;Build info: %6$s, %7$s branch
         &lt;/html&gt;
     </string>
+    <string name="play_2048">Play 2048</string>
+    <string name="play_15">Play 15</string>
 
 </resources>
