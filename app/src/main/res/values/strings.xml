@@ -3,4 +3,16 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="build_info">Build Info</string>
+    <!-- for about menu item -->
+    <string name="about_query" >
+        &lt;html&gt;%1$s
+        &lt;br&gt;Version(%2$d, %3$s)
+        &lt;br&gt;Build date:   %4$s
+        &lt;br&gt;Install date: %5$s
+        &lt;br&gt;Build info: %6$s, %7$s branch
+        &lt;/html&gt;
+    </string>
+
 </resources>
