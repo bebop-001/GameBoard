@@ -23,7 +23,7 @@ const val ACTION_NO_ACTION  = -1
 const val MAX_TOUCH_DURATION = 500 // milliseconds
 // minimum distance to define a swipe.  Anything shorter is a click.
 const val MIN_SWIPE_DISTANCE = 50 // dp
-class SwipeDetector {
+class SwipeDetector (val setSwipe : (Swipe) -> Unit){
     class Event (val x : Int = 0, val y : Int = 0
                       , val time : Long = System.currentTimeMillis()) {
         override fun toString(): String {
@@ -77,6 +77,7 @@ class SwipeDetector {
             MotionEvent.ACTION_DOWN -> startEvent(x, y)
             MotionEvent.ACTION_UP -> {
                 endEvent(x, y)
+                setSwipe(swipeDirection())
                 Log.d(
                     "swipeDetect", "x:${deltaX()} "
                             + "y:${deltaY()} "
