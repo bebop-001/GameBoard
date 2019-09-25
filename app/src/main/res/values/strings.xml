@@ -16,5 +16,6 @@
     </string>
     <string name="play_2048">Play 2048</string>
     <string name="play_15">Play 15</string>
+    <string name="new_game">New Game</string>
 
 </resources>

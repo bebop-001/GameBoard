@@ -1,10 +1,8 @@
 package com.kana_tutor.gameboard.game2048
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,6 +27,19 @@ class Game2048Fragment : Fragment() {
     private lateinit var viewModel : Game2048ViewModel
     private lateinit var binding: GameFragmentBinding
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var rv = true
+        when (item.itemId) {
+            R.id.new_game_item -> {println("New Game")}
+            else -> rv = super.onOptionsItemSelected(item)
+        }
+        return rv
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_menu, menu)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,6 +53,8 @@ class Game2048Fragment : Fragment() {
         val sd = SwipeDetector {viewModel.onSwipe(it)}
         container!!.setOnTouchListener{view, event -> sd.detect(view, event)}
         container!!.setGridAndButtonsSize(600)
+
+        setHasOptionsMenu(true)
 
         return binding.root
     }
