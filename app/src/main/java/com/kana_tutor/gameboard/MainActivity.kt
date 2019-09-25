@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val PLAY_2048     = 0
         const val PLAY_15   = PLAY_2048 + 1
+        var displayTheme = 0 // for light or dark theme.
         var selectedGame = 0
     }
     // Return a spanned html string using the appropriate call for
@@ -75,6 +76,17 @@ class MainActivity : AppCompatActivity() {
             .putInt("selectedGame", selectedGame)
             .apply()
     }
+    fun changeDisplayTheme(currentName : String) {
+        // if currentName is dark, select dark theme.
+        if (currentName == resources.getString(R.string.dark_theme))
+            displayTheme = R.string.dark_theme
+        else
+            displayTheme = R.string.light_theme
+        getSharedPreferences("user_prefs.txt", Context.MODE_PRIVATE)
+            .edit()
+            .putInt("selectedGame", displayTheme)
+            .apply()
+    }
     // Menu item selected listener.
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var rv = true
@@ -83,6 +95,7 @@ class MainActivity : AppCompatActivity() {
             R.id.build_info_item -> displayAboutInfo()
             R.id.game_15_select -> newGameSelected(PLAY_15)
             R.id.game_2048_select -> newGameSelected(PLAY_2048)
+            R.id.select_display_theme -> changeDisplayTheme(item.title.toString())
             // If item isn't for this menu, you must call the super or
             // other things that must happen (eg: up-button in onSupportNavigateUp)
             // won't happen.
@@ -90,20 +103,27 @@ class MainActivity : AppCompatActivity() {
         return rv
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+    fun updateMenuSelections(menu: Menu) {
         if (selectedGame == PLAY_2048)
             menu!!.findItem(R.id.game_2048_select).setChecked(true)
         else
             menu!!.findItem(R.id.game_15_select).setChecked(true)
+        // selectiion is opposite of what is selected
+        if (displayTheme == R.string.light_theme)
+            menu!!.findItem(R.id.select_display_theme).setTitle(R.string.dark_theme)
+        else
+            menu!!.findItem(R.id.select_display_theme).setTitle(R.string.light_theme)
 
+    }
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        if (menu != null)
+            updateMenuSelections(menu)
         return super.onPrepareOptionsMenu(menu)
     }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-        if (selectedGame == PLAY_2048)
-            menu!!.findItem(R.id.game_2048_select).setChecked(true)
-        else
-            menu!!.findItem(R.id.game_15_select).setChecked(true)
+        if (menu != null)
+            updateMenuSelections(menu)
         return true
     }
 
@@ -114,6 +134,7 @@ class MainActivity : AppCompatActivity() {
         val prefs
                 = getSharedPreferences("user_prefs.txt", Context.MODE_PRIVATE)
         selectedGame = prefs.getInt("selectedGame", PLAY_2048)
+        displayTheme = prefs.getInt("displayTheme", R.string.light_theme)
 
         supportFragmentManager
             .beginTransaction()

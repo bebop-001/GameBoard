@@ -24,6 +24,11 @@
         android:title="@string/build_info"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/select_display_theme"
+        android:title="@string/dark_theme"
+        app:showAsAction="never"
+        />
     <group android:checkableBehavior="single" >
         <item
             android:id="@+id/game_2048_select"
