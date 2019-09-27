@@ -21,7 +21,7 @@ class Game2048ViewModel : ViewModel() {
         get() = _gameWon
     private var _gameOver = MutableLiveData<Boolean>(false)
     val gameOver : LiveData<Boolean>
-        get() = _gameWon
+        get() = _gameOver
 
     fun newGame() : Game2048 {
         _gameOver.value = false
@@ -31,7 +31,9 @@ class Game2048ViewModel : ViewModel() {
         _boardPositions.value = game.toString()
         return game
     }
+    fun getScore() : String = game.score
     fun onSwipe(swipe : Swipe) {
+        _gameOver.value = ! game.canMove()
         if (_gameOver.value == false) {
             when(swipe) {
                 Swipe.LEFT -> game.processMove(Direction.LEFT)
@@ -41,7 +43,6 @@ class Game2048ViewModel : ViewModel() {
                 else -> {/* for now, ignore... */ }
             }
             _boardPositions.value = "$swipe:$game"
-            if (! game.canMove()) _gameOver.value = true
             if (game.hasWon()) _gameWon.value = true
         }
         // Log.d("Swipe:", "$swipe -> ${_boardPositions.value}")

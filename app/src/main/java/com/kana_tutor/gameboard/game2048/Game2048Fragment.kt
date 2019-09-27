@@ -1,11 +1,14 @@
 package com.kana_tutor.gameboard.game2048
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -39,6 +42,25 @@ class Game2048Fragment : Fragment() {
         inflater.inflate(R.menu.fragment_menu, menu)
     }
 
+    private fun displayScore() {
+        val score = viewModel.getScore()
+        // use a text-view in the alert so we can display an html
+        // formatted string.
+        val scoreTv = TextView(this.context)
+        scoreTv.apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f)
+            setTypeface(null, Typeface.BOLD)
+            // text = htmlString(htmlString)
+            text = "Game Over.  Your score is:\n$score"
+            // gravity = Gravity.CENTER
+        }
+
+        AlertDialog.Builder(this.context!!)
+            .setView(scoreTv)
+            .show()
+
+    }
+
     fun updateView(positions:String, view : GridLayout) {
         val cellValues = """(\d+|-)""".toRegex().findAll(positions).map{it.value}.toList()
         if (cellValues.size != 16)
@@ -65,8 +87,10 @@ class Game2048Fragment : Fragment() {
         viewModel.gameOver.observe(
             this,
             Observer {
-                if (it)
-                    Toast.makeText(this.context,"Game Over", Toast.LENGTH_LONG).show()
+                if (it) {
+                    // Toast.makeText(this.context, "Game Over", Toast.LENGTH_LONG).show()
+                    displayScore()
+                }
             }
         )
 
