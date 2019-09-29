@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
 import android.widget.GridLayout
 import androidx.core.view.doOnLayout
 import java.lang.RuntimeException
@@ -109,37 +111,24 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
     is complete then uses the measured size of the view group containing the
     grid layout to calculate tile size.
  */
-fun ViewGroup.setGridAndButtonsSize(maxSizeDP : Int) {
-    doOnLayout {
-        addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-            override fun onLayoutChange(
-                view: View, left: Int, top: Int, right: Int, bottom: Int,
-                oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
-            ) {
-                val gl : GridLayout
-                if(view is ViewGroup && view.childCount > 0 && view.getChildAt(0) is GridLayout) {
-                    gl = view.getChildAt(0) as GridLayout
-                }
-                else {
-                    throw RuntimeException("setGridAndButtonsSize: "
-                            + "Failed to find GridLayout at child(0)")
-                }
-                val rows = gl.rowCount; val cols = gl.columnCount
-                if (rows != cols)
-                    throw RuntimeException("setGridAndButtonsSize:"
-                            + "currently works only with rows == columns.\n"
-                            + "Found rows = $rows, columns = $cols")
-                val w = min(min(abs(right - left), abs(top - bottom)), maxSizeDP / rows)
-                for (i in 0..(gl.childCount - 1)) {
-                    val child = gl.getChildAt(i)
+fun GridLayout.setGridTileSize(maxSize : Int) {
+    viewTreeObserver.addOnGlobalLayoutListener(
+        object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                viewTreeObserver
+                    .removeOnGlobalLayoutListener(this)
+                val p = parent as FrameLayout
+                // viewTreeObserver.removeOnGlobalLayoutListener()
+                val calcButtonWidth = ((min(min(p.width, p.height), maxSize)) / rowCount) - 15
+                for (i in 0..(childCount - 1)) {
+                    val child = getChildAt(i)
                     val layoutParams = child.layoutParams
-                    layoutParams.height = w
-                    layoutParams.width = w
+                    layoutParams.height = calcButtonWidth
+                    layoutParams.width = calcButtonWidth
                     child.layoutParams = layoutParams
                 }
-                Log.d("onLayout:", " w = $w dp")
-                view.removeOnLayoutChangeListener(this)
+                Log.d("onLayout:", "bw=$calcButtonWidth")
             }
-        })
-    }
+        }
+    )
 }

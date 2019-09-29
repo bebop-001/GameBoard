@@ -7,17 +7,15 @@ import android.util.TypedValue
 import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 
-import com.kana_tutor.gameboard.databinding.GameFragmentBinding
+// import com.kana_tutor.gameboard.databinding.GameFragmentBinding
 import com.kana_tutor.gameboard.R
 import com.kana_tutor.gameboard.utils.SwipeDetector
-import com.kana_tutor.gameboard.utils.setGridAndButtonsSize
+import com.kana_tutor.gameboard.utils.setGridTileSize
 import java.lang.RuntimeException
 
 
@@ -27,7 +25,7 @@ class Game2048Fragment : Fragment() {
         fun newInstance() = Game2048Fragment()
     }
     private lateinit var viewModel : Game2048ViewModel
-    private lateinit var binding: GameFragmentBinding
+    // private lateinit var binding: GameFragmentBinding
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var rv = true
@@ -40,6 +38,7 @@ class Game2048Fragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.fragment_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun displayScore() {
@@ -61,14 +60,14 @@ class Game2048Fragment : Fragment() {
 
     }
 
-    fun updateView(positions:String, view : GridLayout) {
+    private fun updateView(positions:String, view : GridLayout) {
         val cellValues = """(\d+|-)""".toRegex().findAll(positions).map{it.value}.toList()
         if (cellValues.size != 16)
             throw RuntimeException("updateGrid: Bad positions string: $positions\n"
                 + "Does not contain 16 values")
         if (view.childCount != 16)
             throw RuntimeException("updateGrid: Expected 16 views. found ${view.childCount}")
-        for (i in 0 .. (view.childCount - 1)) {
+        for (i in 0 until view.childCount) {
             val tv = view.getChildAt(i) as TextView
             tv.text = if (cellValues[i] == "-") "" else cellValues[i]
             Log.d("tv update:", "$i: \"${tv.text}\"")
@@ -96,23 +95,29 @@ class Game2048Fragment : Fragment() {
 
 
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(
+        /* binding = DataBindingUtil.inflate(
             inflater, R.layout.game_fragment, container, false)
         binding.setLifecycleOwner(this)
+        */
 
+        val gl = inflater.inflate(
+            R.layout.game_fragment, container, false
+        ) as GridLayout
 
         val sd = SwipeDetector {viewModel.onSwipe(it)}
         container!!.setOnTouchListener{view, event -> sd.detect(view, event)}
-        container!!.setGridAndButtonsSize(600)
+        // container!!.setGridAndButtonsSize(600)
+        // container!!.(600)
+        gl.setGridTileSize(600)
 
         setHasOptionsMenu(true)
 
-        return binding.root
+        // return binding.root
+        return gl
     }
 
 }

@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.container, Game2048Fragment.newInstance(), "Play 2048")
+            .replace(R.id.container, Game2048Fragment.newInstance(), "Play 2048")
             .commit()
     }
 }
