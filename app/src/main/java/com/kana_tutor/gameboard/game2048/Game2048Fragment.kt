@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.kana_tutor.gameboard.MainActivity
 
 // import com.kana_tutor.gameboard.databinding.GameFragmentBinding
 import com.kana_tutor.gameboard.R
@@ -78,6 +79,7 @@ class Game2048Fragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         viewModel = ViewModelProviders.of(this).get(Game2048ViewModel::class.java)
         viewModel.boardPositions.observe(
             this
@@ -92,17 +94,13 @@ class Game2048Fragment : Fragment() {
                 }
             }
         )
-
-
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        /* binding = DataBindingUtil.inflate(
-            inflater, R.layout.game_fragment, container, false)
-        binding.setLifecycleOwner(this)
-        */
+
+        (activity as MainActivity).setActionBarTitle(tag!!)
 
         val gl = inflater.inflate(
             R.layout.game_fragment, container, false
@@ -110,13 +108,10 @@ class Game2048Fragment : Fragment() {
 
         val sd = SwipeDetector {viewModel.onSwipe(it)}
         container!!.setOnTouchListener{view, event -> sd.detect(view, event)}
-        // container!!.setGridAndButtonsSize(600)
-        // container!!.(600)
         gl.setGridTileSize(600)
 
         setHasOptionsMenu(true)
 
-        // return binding.root
         return gl
     }
 

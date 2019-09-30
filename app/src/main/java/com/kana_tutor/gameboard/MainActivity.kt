@@ -115,6 +115,10 @@ class MainActivity : AppCompatActivity() {
             menu!!.findItem(R.id.select_display_theme).setTitle(R.string.light_theme)
 
     }
+    // called from fragment to set action bar title.
+    fun setActionBarTitle(title : String) {
+        supportActionBar?.title = title
+    }
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         if (menu != null)
             updateMenuSelections(menu)
