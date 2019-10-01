@@ -33,8 +33,8 @@ android {
         applicationId "com.kana_tutor.gameboard"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField 'long', 'BUILD_TIMESTAMP', String.format("0x%08xL", System.currentTimeMillis())
         buildConfigField "String", "BRANCH_NAME", "\"${gitBranch()}\""
