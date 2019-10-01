@@ -14,14 +14,14 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
+import com.kana_tutor.gameboard.game15.Game15Fragment
 import com.kana_tutor.gameboard.game2048.Game2048Fragment
 import java.io.File
+import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        const val PLAY_2048     = 0
-        const val PLAY_15   = PLAY_2048 + 1
         var displayTheme = 0 // for light or dark theme.
         var selectedGame = 0
     }
@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
             .edit()
             .putInt("selectedGame", selectedGame)
             .apply()
+        recreate()
     }
     fun changeDisplayTheme(currentName : String) {
         // if currentName is dark, select dark theme.
@@ -93,8 +94,8 @@ class MainActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.build_info_item -> displayAboutInfo()
-            R.id.game_15_select -> newGameSelected(PLAY_15)
-            R.id.game_2048_select -> newGameSelected(PLAY_2048)
+            R.id.game_15_select -> newGameSelected(R.string.play_15)
+            R.id.game_2048_select -> newGameSelected(R.string.play_2048)
             R.id.select_display_theme -> changeDisplayTheme(item.title.toString())
             // If item isn't for this menu, you must call the super or
             // other things that must happen (eg: up-button in onSupportNavigateUp)
@@ -104,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateMenuSelections(menu: Menu) {
-        if (selectedGame == PLAY_2048)
+        if (selectedGame == R.string.play_2048)
             menu!!.findItem(R.id.game_2048_select).setChecked(true)
         else
             menu!!.findItem(R.id.game_15_select).setChecked(true)
@@ -137,13 +138,23 @@ class MainActivity : AppCompatActivity() {
 
         val prefs
                 = getSharedPreferences("user_prefs.txt", Context.MODE_PRIVATE)
-        selectedGame = prefs.getInt("selectedGame", PLAY_2048)
+        selectedGame = prefs.getInt("selectedGame", R.string.play_2048)
         displayTheme = prefs.getInt("displayTheme", R.string.light_theme)
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, Game2048Fragment.newInstance(), "Play 2048")
-            .commit()
+        val fragTransaction = supportFragmentManager.beginTransaction()
+        when (selectedGame) {
+            R.string.play_2048 ->
+                fragTransaction
+                    .replace(R.id.container, Game2048Fragment.newInstance(), "Play 2048")
+                    .commit()
+            R.string.play_15 ->
+                fragTransaction
+                    .replace(R.id.container, Game15Fragment.newInstance(), "Play Fifteen")
+                    .commit()
+            else -> throw RuntimeException(
+                String.format("Unknown fragment name resource id: 0x%08x", selectedGame )
+            )
+        }
     }
 }
 
