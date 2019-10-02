@@ -1,6 +1,10 @@
 package com.kana_tutor.gameboard.game15
 
+import android.content.Context
+import android.content.Context.AUDIO_SERVICE
 import android.graphics.Typeface
+import android.media.AudioManager
+import android.media.AudioManager.FX_KEY_CLICK
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -8,6 +12,9 @@ import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.getSystemServiceName
+import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -59,7 +66,6 @@ class Game15Fragment : Fragment() {
             .show()
 
     }
-
     private fun updateView(positions:String, view : GridLayout) {
         val cellValues = """(\d+|-)""".toRegex().findAll(positions).map{it.value}.toList()
         if (cellValues.size != 16)
@@ -70,7 +76,12 @@ class Game15Fragment : Fragment() {
         if (viewModel.gameOver.value == false) {
             for (i in 0 until view.childCount) {
                 val tv = view.getChildAt(i) as TextView
-                tv.text = if (cellValues[i] == "-") "" else cellValues[i]
+                val textVal = if (cellValues[i] == "-") "" else cellValues[i]
+                tv.text = textVal
+                if(textVal != "" && textVal.isDigitsOnly() && textVal.toInt() % 2 == 0)
+                    tv.setTextColor(resources.getColor(R.color.red))
+                else
+                    tv.setTextColor(resources.getColor(R.color.game_15_dark))
                 Log.d("tv update:", "$i: \"${tv.text}\"")
             }
             view.invalidate()
