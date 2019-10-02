@@ -1,15 +1,13 @@
 package com.kana_tutor.gameboard.utils
 
 import android.content.res.Resources
-import android.util.Log
+import android.media.AudioManager
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.GridLayout
-import androidx.core.view.doOnLayout
-import java.lang.RuntimeException
+import android.widget.TextView
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -80,12 +78,7 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
             MotionEvent.ACTION_UP -> {
                 endEvent(x, y)
                 setSwipe(swipeDirection())
-                Log.d(
-                    "swipeDetect", "x:${deltaX()} "
-                            + "y:${deltaY()} "
-                            + "t:${deltaT()} "
-                            + "swipe: ${swipeDirection()}"
-                )
+                view.playSoundEffect(AudioManager.FX_KEY_CLICK)
             }
             MotionEvent.ACTION_MOVE -> {}
             else -> {
@@ -121,13 +114,10 @@ fun GridLayout.setGridTileSize(maxSize : Int) {
                 // viewTreeObserver.removeOnGlobalLayoutListener()
                 val calcButtonWidth = ((min(min(p.width, p.height), maxSize)) / rowCount) - 15
                 for (i in 0..(childCount - 1)) {
-                    val child = getChildAt(i)
-                    val layoutParams = child.layoutParams
-                    layoutParams.height = calcButtonWidth
-                    layoutParams.width = calcButtonWidth
-                    child.layoutParams = layoutParams
+                    val child:TextView = getChildAt(i) as TextView
+                    child.width = calcButtonWidth
+                    child.height = calcButtonWidth
                 }
-                Log.d("onLayout:", "bw=$calcButtonWidth")
             }
         }
     )
