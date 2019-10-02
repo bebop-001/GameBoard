@@ -1,19 +1,13 @@
 package com.kana_tutor.gameboard.game15
 
-import android.content.Context
-import android.content.Context.AUDIO_SERVICE
 import android.graphics.Typeface
-import android.media.AudioManager
-import android.media.AudioManager.FX_KEY_CLICK
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.getSystemServiceName
+import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -49,16 +43,13 @@ class Game15Fragment : Fragment() {
     }
 
     private fun displayScore() {
-        val score = viewModel.getScore()
         // use a text-view in the alert so we can display an html
         // formatted string.
         val scoreTv = TextView(this.context)
         scoreTv.apply {
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f)
             setTypeface(null, Typeface.BOLD)
-            // text = htmlString(htmlString)
-            text = "Game Over.\n$score"
-            // gravity = Gravity.CENTER
+            text = getString(R.string.your_score, viewModel.getScore())
         }
 
         AlertDialog.Builder(this.context!!)
@@ -79,10 +70,11 @@ class Game15Fragment : Fragment() {
                 val textVal = if (cellValues[i] == "-") "" else cellValues[i]
                 tv.text = textVal
                 if(textVal != "" && textVal.isDigitsOnly() && textVal.toInt() % 2 == 0)
-                    tv.setTextColor(resources.getColor(R.color.red))
+                    tv.setTextColor(
+                        ContextCompat.getColor(context!!, R.color.red))
                 else
-                    tv.setTextColor(resources.getColor(R.color.game_15_dark))
-                Log.d("tv update:", "$i: \"${tv.text}\"")
+                    tv.setTextColor(
+                        ContextCompat.getColor(context!!, R.color.game_15_dark))
             }
             view.invalidate()
         }

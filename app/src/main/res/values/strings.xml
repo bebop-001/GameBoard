@@ -20,4 +20,6 @@
     <string name="dark_theme">Select Dark Theme</string>
     <string name="light_theme">Select Light Theme</string>
 
+    <string name="your_score">Your score:\n%1$s</string>
+
 </resources>

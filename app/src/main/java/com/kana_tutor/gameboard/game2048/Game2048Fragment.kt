@@ -8,13 +8,13 @@ import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.kana_tutor.gameboard.MainActivity
 
-// import com.kana_tutor.gameboard.databinding.GameFragmentBinding
 import com.kana_tutor.gameboard.R
 import com.kana_tutor.gameboard.utils.SwipeDetector
 import com.kana_tutor.gameboard.utils.setGridTileSize
@@ -44,16 +44,13 @@ class Game2048Fragment : Fragment() {
     }
 
     private fun displayScore() {
-        val score = viewModel.getScore()
         // use a text-view in the alert so we can display an html
         // formatted string.
         val scoreTv = TextView(this.context)
         scoreTv.apply {
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f)
             setTypeface(null, Typeface.BOLD)
-            // text = htmlString(htmlString)
-            text = "Game Over.  Your score is:\n$score"
-            // gravity = Gravity.CENTER
+            text = getString(R.string.your_score, viewModel.getScore())
         }
 
         AlertDialog.Builder(this.context!!)
@@ -89,11 +86,13 @@ class Game2048Fragment : Fragment() {
             tv.text = tvText
             if (tvText != "" && tvText.isDigitsOnly()) {
                 val colorVal = tvText.toInt()
-                tv.setTextColor(resources.getColor(colorsMap[colorVal]!!))
+                tv.setTextColor(
+                    ContextCompat.getColor(context!!, colorsMap[colorVal]!!)
+                )
             }
 
             tv.text = if (cellValues[i] == "-") "" else cellValues[i]
-            Log.d("tv update:", "$i: \"${tv.text}\"")
+            Log.d("tv update:", "$i: \"${tv.text}\" size=${tv.width}x${tv.height}")
         }
         view.invalidate()
     }
