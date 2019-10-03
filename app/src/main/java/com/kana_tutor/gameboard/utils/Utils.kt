@@ -2,6 +2,8 @@ package com.kana_tutor.gameboard.utils
 
 import android.content.res.Resources
 import android.media.AudioManager
+import android.util.Log
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -13,6 +15,7 @@ import kotlin.math.min
 
 val displayDensity = Resources.getSystem().displayMetrics.density
 fun Int.toDP() : Int = (toFloat() / displayDensity).toInt()
+fun Int.toPix() : Int = (toFloat() * displayDensity).toInt()
 
 enum class Swipe {
     UP, DOWN, LEFT, RIGHT, CLICK, NONE
@@ -94,7 +97,8 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
     }
 }
 
-
+// var textScalingMin =
+    var textScalingMax = 600.0 to 30.0
 /*
     Method for setting size of views in a grid layout.  Assumes square
     (i.e. rows == columns) layout.  Calculates max possible size and then
@@ -104,7 +108,7 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
     is complete then uses the measured size of the view group containing the
     grid layout to calculate tile size.
  */
-fun GridLayout.setGridTileSize(maxSize : Int) {
+fun GridLayout.setGridTileSize(maxSize : Int, scaleText : Boolean) {
     viewTreeObserver.addOnGlobalLayoutListener(
         object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -112,11 +116,16 @@ fun GridLayout.setGridTileSize(maxSize : Int) {
                     .removeOnGlobalLayoutListener(this)
                 val p = parent as FrameLayout
                 // viewTreeObserver.removeOnGlobalLayoutListener()
-                val calcButtonWidth = ((min(min(p.width, p.height), maxSize)) / rowCount) - 15
+                var calcButtonWidth = ((min(min(p.width, p.height), maxSize)) / rowCount) - 4.toPix() // 4.toPix for grid view 4dp padding
+                var dims = listOf(p.width, p.height, p.width.toDP(), p.height.toDP())
+                Log.d("setGridTileSize:",
+                    "display size:$dims")
                 for (i in 0..(childCount - 1)) {
                     val child:TextView = getChildAt(i) as TextView
                     child.width = calcButtonWidth
                     child.height = calcButtonWidth
+                    if (scaleText) child.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+                    else child.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
                 }
             }
         }

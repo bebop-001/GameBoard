@@ -13,6 +13,7 @@
         android:columnCount="4"
         android:orientation="horizontal"
         android:rowCount="4"
+        android:padding="4dp"
         tools:context="com.kana_tutor.game_board.MainActivity">
 
         <include layout="@layout/grid_elements" />
