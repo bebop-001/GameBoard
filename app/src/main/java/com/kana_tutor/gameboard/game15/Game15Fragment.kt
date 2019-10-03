@@ -17,6 +17,7 @@ import com.kana_tutor.gameboard.MainActivity
 import com.kana_tutor.gameboard.R
 import com.kana_tutor.gameboard.utils.SwipeDetector
 import com.kana_tutor.gameboard.utils.setGridTileSize
+import com.kana_tutor.gameboard.utils.toPix
 import java.lang.RuntimeException
 
 
@@ -111,7 +112,7 @@ class Game15Fragment : Fragment() {
 
         val sd = SwipeDetector {viewModel.onSwipe(it)}
         container!!.setOnTouchListener{view, event -> sd.detect(view, event)}
-        gl.setGridTileSize(600)
+        gl.setGridTileSize(600.toPix(), false)
 
         setHasOptionsMenu(true)
 
