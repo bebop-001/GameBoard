@@ -80,8 +80,10 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
             MotionEvent.ACTION_DOWN -> startEvent(x, y)
             MotionEvent.ACTION_UP -> {
                 endEvent(x, y)
-                setSwipe(swipeDirection())
-                view.playSoundEffect(AudioManager.FX_KEY_CLICK)
+                val swipe = swipeDirection()
+                setSwipe(swipe)
+                if (swipe != Swipe.NONE && swipe != Swipe.CLICK)
+                    view.playSoundEffect(AudioManager.FX_KEY_CLICK)
             }
             MotionEvent.ACTION_MOVE -> {}
             else -> {
@@ -97,8 +99,16 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
     }
 }
 
-// var textScalingMin =
-    var textScalingMax = 600.0 to 30.0
+const val MAX_FONT_SIZE  = 30f
+const val MAX_BUTTON_SIZE = 150
+var textScalingMin = 75 to 20f // 100 dp button gets 16sp font
+var textScalingMax = MAX_BUTTON_SIZE to MAX_FONT_SIZE
+fun calcScaledFontSize(buttonSizeDP : Int) : Float {
+    val (w1,f1) = textScalingMin
+    val (w2,f2) = textScalingMax
+    val m = (f1 - f2) / (w1.toFloat() - w2.toFloat())
+    return (m * (buttonSizeDP - w1)) + f1
+}
 /*
     Method for setting size of views in a grid layout.  Assumes square
     (i.e. rows == columns) layout.  Calculates max possible size and then
@@ -108,7 +118,7 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
     is complete then uses the measured size of the view group containing the
     grid layout to calculate tile size.
  */
-fun GridLayout.setGridTileSize(maxSize : Int, scaleText : Boolean) {
+fun GridLayout.setGridTileSize(scaleText : Boolean) {
     viewTreeObserver.addOnGlobalLayoutListener(
         object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -116,16 +126,20 @@ fun GridLayout.setGridTileSize(maxSize : Int, scaleText : Boolean) {
                     .removeOnGlobalLayoutListener(this)
                 val p = parent as FrameLayout
                 // viewTreeObserver.removeOnGlobalLayoutListener()
-                var calcButtonWidth = ((min(min(p.width, p.height), maxSize)) / rowCount) - 4.toPix() // 4.toPix for grid view 4dp padding
-                var dims = listOf(p.width, p.height, p.width.toDP(), p.height.toDP())
+                var calcButtonSize = (min(p.width, p.height) / rowCount) - 4.toPix() //4.toPix for grid view 4dp padding
+                calcButtonSize = min(calcButtonSize, MAX_BUTTON_SIZE)
+                val fontSize : Float = if(scaleText)
+                            calcScaledFontSize(calcButtonSize.toDP())
+                        else
+                            MAX_FONT_SIZE
+                val dims = listOf(p.width, p.height, p.width.toDP(), p.height.toDP(), calcButtonSize.toDP(), fontSize.toInt())
                 Log.d("setGridTileSize:",
                     "display size:$dims")
                 for (i in 0..(childCount - 1)) {
                     val child:TextView = getChildAt(i) as TextView
-                    child.width = calcButtonWidth
-                    child.height = calcButtonWidth
-                    if (scaleText) child.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
-                    else child.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
+                    child.width = calcButtonSize
+                    child.height = calcButtonSize
+                    child.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
                 }
             }
         }

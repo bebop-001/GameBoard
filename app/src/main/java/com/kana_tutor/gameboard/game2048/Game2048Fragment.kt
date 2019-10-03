@@ -131,7 +131,7 @@ class Game2048Fragment : Fragment() {
 
         val sd = SwipeDetector {viewModel.onSwipe(it)}
         container!!.setOnTouchListener{view, event -> sd.detect(view, event)}
-        gl.setGridTileSize(600.toPix(), true)
+        gl.setGridTileSize(true)
 
         setHasOptionsMenu(true)
 
