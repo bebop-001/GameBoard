@@ -13,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.text.HtmlCompat
 import com.kana_tutor.gameboard.game15.Game15Fragment
 import com.kana_tutor.gameboard.game2048.Game2048Fragment
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             displayTheme = R.string.light_theme
         getSharedPreferences("user_prefs.txt", Context.MODE_PRIVATE)
             .edit()
-            .putInt("selectedGame", displayTheme)
+            .putInt("displayTheme", displayTheme)
             .apply()
     }
     // Menu item selected listener.
@@ -96,7 +97,10 @@ class MainActivity : AppCompatActivity() {
             R.id.build_info_item -> displayAboutInfo()
             R.id.game_15_select -> newGameSelected(R.string.play_15)
             R.id.game_2048_select -> newGameSelected(R.string.play_2048)
-            R.id.select_display_theme -> changeDisplayTheme(item.title.toString())
+            R.id.select_display_theme -> {
+                changeDisplayTheme(item.title.toString())
+                recreate()
+            }
             // If item isn't for this menu, you must call the super or
             // other things that must happen (eg: up-button in onSupportNavigateUp)
             // won't happen.
@@ -114,7 +118,6 @@ class MainActivity : AppCompatActivity() {
             menu!!.findItem(R.id.select_display_theme).setTitle(R.string.dark_theme)
         else
             menu!!.findItem(R.id.select_display_theme).setTitle(R.string.light_theme)
-
     }
     // called from fragment to set action bar title.
     fun setActionBarTitle(title : String) {
@@ -140,6 +143,10 @@ class MainActivity : AppCompatActivity() {
                 = getSharedPreferences("user_prefs.txt", Context.MODE_PRIVATE)
         selectedGame = prefs.getInt("selectedGame", R.string.play_2048)
         displayTheme = prefs.getInt("displayTheme", R.string.light_theme)
+        if (displayTheme == R.string.light_theme)
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        else
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         val fragTransaction = supportFragmentManager.beginTransaction()
         when (selectedGame) {

@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
@@ -16,6 +17,7 @@ import com.kana_tutor.gameboard.MainActivity
 
 import com.kana_tutor.gameboard.R
 import com.kana_tutor.gameboard.utils.SwipeDetector
+import com.kana_tutor.gameboard.utils.resolveColorAttr
 import com.kana_tutor.gameboard.utils.setGridTileSize
 import com.kana_tutor.gameboard.utils.toPix
 import java.lang.RuntimeException
@@ -73,9 +75,12 @@ class Game15Fragment : Fragment() {
                 if(textVal != "" && textVal.isDigitsOnly() && textVal.toInt() % 2 == 0)
                     tv.setTextColor(
                         ContextCompat.getColor(context!!, R.color.red))
-                else
-                    tv.setTextColor(
-                        ContextCompat.getColor(context!!, R.color.game_15_dark))
+                else {
+                    @ColorInt val color =
+                        resolveColorAttr(view.context, android.R.attr.textColorPrimary)
+
+                    tv.setTextColor(color)
+                }
             }
             view.invalidate()
         }
