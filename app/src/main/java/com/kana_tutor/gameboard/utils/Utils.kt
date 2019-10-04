@@ -127,7 +127,7 @@ fun GridLayout.setGridTileSize(scaleText : Boolean) {
                 val p = parent as FrameLayout
                 // viewTreeObserver.removeOnGlobalLayoutListener()
                 var calcButtonSize = (min(p.width, p.height) / rowCount) - 4.toPix() //4.toPix for grid view 4dp padding
-                calcButtonSize = min(calcButtonSize, MAX_BUTTON_SIZE)
+                calcButtonSize = min(calcButtonSize, MAX_BUTTON_SIZE.toPix())
                 val fontSize : Float = if(scaleText)
                             calcScaledFontSize(calcButtonSize.toDP())
                         else
