@@ -22,6 +22,15 @@ static def gitBuildId() {
     proc.waitFor()
     buildId
 }
+// use git to get the current branch identifier.
+static def gitCommitDate() {
+    def commitDate = ""
+    def proc = "utils/gitCommitDate".execute()
+    proc.in.eachLine { line -> commitDate = line }
+    proc.err.eachLine { line -> commitDate line }
+    proc.waitFor()
+    commitDate
+}
 
 android {
     compileSdkVersion 29
@@ -39,8 +48,7 @@ android {
         buildConfigField 'long', 'BUILD_TIMESTAMP', String.format("0x%08xL", System.currentTimeMillis())
         buildConfigField "String", "BRANCH_NAME", "\"${gitBranch()}\""
         buildConfigField "String", "BUILD_ID", "\"${gitBuildId()}\""
-
-
+        buildConfigField "String", "COMMIT_DATE", "\"${gitCommitDate()}\""
     }
     buildTypes {
         release {
