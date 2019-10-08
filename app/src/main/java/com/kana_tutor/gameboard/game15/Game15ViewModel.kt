@@ -1,6 +1,5 @@
 package com.kana_tutor.gameboard.game15
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,8 +16,6 @@ class Game15ViewModel : ViewModel() {
     val boardPositions : LiveData<String>
         get() = _boardPositions
     private var _gameWon = MutableLiveData<Boolean>(false)
-    val gameWon : LiveData<Boolean>
-        get() = _gameWon
     private var _gameOver = MutableLiveData<Boolean>(false)
     val gameOver : LiveData<Boolean>
         get() = _gameOver

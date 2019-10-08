@@ -1,6 +1,5 @@
 package com.kana_tutor.gameboard.game2048
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,7 +39,7 @@ class Game2048ViewModel : ViewModel() {
                 Swipe.RIGHT -> game.processMove(Direction.RIGHT)
                 Swipe.UP -> game.processMove(Direction.UP)
                 Swipe.DOWN -> game.processMove(Direction.DOWN)
-                else -> {/* for now, ignore... */ }
+                else -> { /* for now, ignore... */ }
             }
             _boardPositions.value = "$swipe:$game"
             if (game.hasWon()) _gameWon.value = true

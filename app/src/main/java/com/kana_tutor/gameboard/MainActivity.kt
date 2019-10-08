@@ -2,6 +2,7 @@ package com.kana_tutor.gameboard
 
 import android.content.Context
 import android.graphics.Typeface
+import android.media.AudioManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,15 +12,24 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import com.kana_tutor.gameboard.game15.Game15Fragment
 import com.kana_tutor.gameboard.game2048.Game2048Fragment
+import kotlinx.android.synthetic.main.frag_container.*
 import java.io.File
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
+import android.content.Intent
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -70,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             .show()
         return true
     }
-    fun newGameSelected(gameId : Int) {
+    private fun newGameSelected(gameId : Int) {
         selectedGame = gameId
         getSharedPreferences("user_prefs.txt", Context.MODE_PRIVATE)
             .edit()
@@ -78,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             .apply()
         recreate()
     }
-    fun changeDisplayTheme(currentName : String) {
+    private fun changeDisplayTheme(currentName : String) {
         // if currentName is dark, select dark theme.
         if (currentName == resources.getString(R.string.dark_theme))
             displayTheme = R.string.dark_theme
@@ -88,6 +98,7 @@ class MainActivity : AppCompatActivity() {
             .edit()
             .putInt("displayTheme", displayTheme)
             .apply()
+        recreate()
     }
     // Menu item selected listener.
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -97,31 +108,27 @@ class MainActivity : AppCompatActivity() {
             R.id.build_info_item -> displayAboutInfo()
             R.id.game_15_select -> newGameSelected(R.string.play_15)
             R.id.game_2048_select -> newGameSelected(R.string.play_2048)
-            R.id.select_display_theme -> {
-                changeDisplayTheme(item.title.toString())
-                recreate()
-            }
+            R.id.select_display_theme -> changeDisplayTheme(item.title.toString())
             // If item isn't for this menu, you must call the super or
             // other things that must happen (eg: up-button in onSupportNavigateUp)
             // won't happen.
             else -> rv = super.onOptionsItemSelected(item);        }
         return rv
     }
-
-    fun updateMenuSelections(menu: Menu) {
+    private fun updateMenuSelections(menu: Menu) {
         if (selectedGame == R.string.play_2048)
-            menu!!.findItem(R.id.game_2048_select).setChecked(true)
+            menu.findItem(R.id.game_2048_select).isChecked = true
         else
-            menu!!.findItem(R.id.game_15_select).setChecked(true)
-        // selectiion is opposite of what is selected
+            menu.findItem(R.id.game_15_select).isChecked = true
+        // selection is opposite of what is selected
         if (displayTheme == R.string.light_theme)
-            menu!!.findItem(R.id.select_display_theme).setTitle(R.string.dark_theme)
+            menu.findItem(R.id.select_display_theme).setTitle(R.string.dark_theme)
         else
-            menu!!.findItem(R.id.select_display_theme).setTitle(R.string.light_theme)
+            menu.findItem(R.id.select_display_theme).setTitle(R.string.light_theme)
     }
     // called from fragment to set action bar title.
     fun setActionBarTitle(title : String) {
-        supportActionBar?.title = title
+        toolbar?.title = title
     }
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         if (menu != null)
@@ -147,6 +154,10 @@ class MainActivity : AppCompatActivity() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         else
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
+        toolbar.overflowIcon = ContextCompat.getDrawable(
+            this, R.drawable.vert_ellipsis_light_img)
+        setSupportActionBar(toolbar)
 
         val fragTransaction = supportFragmentManager.beginTransaction()
         when (selectedGame) {

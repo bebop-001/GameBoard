@@ -1,8 +1,12 @@
 package com.kana_tutor.gameboard.utils
 
 import android.content.Context
+import android.content.Context.VIBRATOR_SERVICE
 import android.content.res.Resources
-import android.media.AudioManager
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.VibrationEffect.createOneShot
+import android.os.Vibrator
 import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
@@ -118,8 +122,22 @@ class SwipeDetector (val setSwipe : (Swipe) -> Unit){
                 endEvent(x, y)
                 val swipe = swipeDirection()
                 setSwipe(swipe)
-                if (swipe != Swipe.NONE && swipe != Swipe.CLICK)
-                    view.playSoundEffect(AudioManager.FX_KEY_CLICK)
+                if (swipe != Swipe.NONE && swipe != Swipe.CLICK) {
+                    val vibrator
+                        = (view.context.getSystemService(VIBRATOR_SERVICE) as Vibrator)
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        vibrator.vibrate(
+                            createOneShot(
+                                50,
+                                VibrationEffect.DEFAULT_AMPLITUDE
+                            )
+                        )
+                    }
+                    else {
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(50)
+                    }
+                }// view.playSoundEffect(AudioManager.FX_KEY_CLICK)
             }
             MotionEvent.ACTION_MOVE -> {}
             else -> {
@@ -150,7 +168,7 @@ fun calcScaledFontSize(buttonSizeDP : Int) : Float {
     (i.e. rows == columns) layout.  Calculates max possible size and then
     sets size to that or maxSizeDP -- which ever is smaller,
 
-    Works by queiong a layout change listener which is called when layout
+    Works by queing a layout change listener which is called when layout
     is complete then uses the measured size of the view group containing the
     grid layout to calculate tile size.
  */
@@ -158,24 +176,44 @@ fun GridLayout.setGridTileSize(scaleText : Boolean) {
     viewTreeObserver.addOnGlobalLayoutListener(
         object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                viewTreeObserver
-                    .removeOnGlobalLayoutListener(this)
-                val p = parent as FrameLayout
-                // viewTreeObserver.removeOnGlobalLayoutListener()
-                var calcButtonSize = (min(p.width, p.height) / rowCount) - 4.toPix() //4.toPix for grid view 4dp padding
-                calcButtonSize = min(calcButtonSize, MAX_BUTTON_SIZE.toPix())
-                val fontSize : Float = if(scaleText)
+                if (parent != null) {
+                    viewTreeObserver
+                        .removeOnGlobalLayoutListener(this)
+                    // for some reason, API 26/android 8 sometimes comes in wrong
+                    // after recreate in theme change.
+                    if (parent != null) {
+                        val p = parent as FrameLayout
+                        // viewTreeObserver.removeOnGlobalLayoutListener()
+                        var calcButtonSize = (min(
+                            p.width,
+                            p.height
+                        ) / rowCount) - 4.toPix() //4.toPix for grid view 4dp padding
+                        calcButtonSize = min(calcButtonSize, MAX_BUTTON_SIZE.toPix())
+                        val fontSize: Float = if (scaleText)
                             calcScaledFontSize(calcButtonSize.toDP())
                         else
                             MAX_FONT_SIZE
-                val dims = listOf(p.width, p.height, p.width.toDP(), p.height.toDP(), calcButtonSize.toDP(), fontSize.toInt())
-                Log.d("setGridTileSize:",
-                    "display size:$dims")
-                for (i in 0..(childCount - 1)) {
-                    val child:TextView = getChildAt(i) as TextView
-                    child.width = calcButtonSize
-                    child.height = calcButtonSize
-                    child.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
+                        val dims = listOf(
+                            p.width,
+                            p.height,
+                            p.width.toDP(),
+                            p.height.toDP(),
+                            calcButtonSize.toDP(),
+                            fontSize.toInt()
+                        )
+                        Log.d(
+                            "setGridTileSize:",
+                            "display size:$dims"
+                        )
+                        for (i in 0..(childCount - 1)) {
+                            val child: TextView = getChildAt(i) as TextView
+                            child.width = calcButtonSize
+                            child.height = calcButtonSize
+                            child.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
+                        }
+                    }
+                    else
+                        Log.d("setGridTileSize:", "null parent")
                 }
             }
         }

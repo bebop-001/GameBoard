@@ -14,13 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.kana_tutor.gameboard.MainActivity
-
 import com.kana_tutor.gameboard.R
 import com.kana_tutor.gameboard.utils.SwipeDetector
 import com.kana_tutor.gameboard.utils.resolveColorAttr
 import com.kana_tutor.gameboard.utils.setGridTileSize
-import com.kana_tutor.gameboard.utils.toPix
-import java.lang.RuntimeException
 
 
 class Game15Fragment : Fragment() {

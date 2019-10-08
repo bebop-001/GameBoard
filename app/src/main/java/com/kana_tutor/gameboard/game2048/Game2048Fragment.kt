@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.*
 import android.widget.GridLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
@@ -14,12 +15,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.kana_tutor.gameboard.MainActivity
-
 import com.kana_tutor.gameboard.R
 import com.kana_tutor.gameboard.utils.SwipeDetector
 import com.kana_tutor.gameboard.utils.setGridTileSize
-import com.kana_tutor.gameboard.utils.toPix
-import java.lang.RuntimeException
 
 
 class Game2048Fragment : Fragment() {
@@ -60,7 +58,7 @@ class Game2048Fragment : Fragment() {
 
     }
 
-    val colorsMap = hashMapOf(
+    private val colorsMap = hashMapOf(
         2 to R.color.color_2,
         4 to R.color.color_4,
         8 to R.color.color_8,
@@ -114,6 +112,16 @@ class Game2048Fragment : Fragment() {
                 if (it) {
                     // Toast.makeText(this.context, "Game Over", Toast.LENGTH_LONG).show()
                     displayScore()
+                }
+            }
+        )
+        viewModel.gameWon.observe(
+            this,
+            Observer {
+                if (it) {
+                    Toast.makeText(this.context
+                        , "You have a cell over 2048!"
+                        , Toast.LENGTH_LONG).show()
                 }
             }
         )
